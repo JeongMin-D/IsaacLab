@@ -77,11 +77,11 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
         print("sim_dt ", sim_dt)
 
         # -- apply action to the robot
-        test_pos =  torch.cuda.FloatTensor(robot.data.default_joint_pos)
-        print("test_pos", test_pos)
+        test_pos = torch.tensor(robot.data.default_joint_pos, dtype=torch.float)
+        test_vel = torch.tensor([[0]*12], dtype=torch.float)
+        test_effort = torch.tensor([[0]*12], dtype=torch.float)
+        
         robot.set_joint_position_target(test_pos)
-        test_vel = torch.cuda.FloatTensor([[0]*12])
-        test_effort = torch.cuda.FloatTensor([[0]*12])
         robot.set_joint_velocity_target(test_vel)
         robot.set_joint_effort_target(test_effort)
 
