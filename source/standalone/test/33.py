@@ -71,19 +71,19 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
     while simulation_app.is_running():
         # Apply random action
         # -- generate random joint efforts
-        joint_pos, joint_vel = robot.data.joint_pos.clone(), robot.data.joint_vel.clone()
-        print("joint_pos:", joint_pos)
-        print("joint_vel", joint_vel)
-        print("sim_dt ", sim_dt)
+        joint_pos, joint_vel = robot.data.default_joint_pos.clone(), robot.data.default_joint_vel.clone()
 
         # -- apply action to the robot
         test_pos = torch.tensor(robot.data.default_joint_pos, dtype=torch.float)
         test_vel = torch.tensor([[0]*12], dtype=torch.float)
         test_effort = torch.tensor([[0]*12], dtype=torch.float)
-        
+
         robot.set_joint_position_target(test_pos)
         robot.set_joint_velocity_target(test_vel)
         robot.set_joint_effort_target(test_effort)
+
+        print("joint_pos:", joint_pos)
+        print("joint_vel", joint_vel)
 
         # -- write data to sim
         robot.write_data_to_sim()
