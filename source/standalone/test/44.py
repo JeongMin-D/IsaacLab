@@ -72,7 +72,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         horizontal_scale=0.1,
         vertical_scale=0.005,
         slope_threshold=0.1,
-        sub_terrains=sub_terrain,
+        #sub_terrains=sub_terrain,
         difficulty_range=(0.0, 1.0),
         use_cache=False
     )

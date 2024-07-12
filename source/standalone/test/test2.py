@@ -1,105 +1,176 @@
-# Copyright (c) 2022-2024, The Isaac Lab Project Developers.
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
-
-"""This script demonstrates how to create a simple stage with terrain in Isaac Sim.
-
-.. code-block:: bash
-
-    # Usage
-    ./isaaclab.sh -p source/standalone/tutorials/00_sim/create_terrain.py
-
-"""
-
-"""Launch Isaac Sim Simulator first."""
-
 import argparse
+
 from omni.isaac.lab.app import AppLauncher
 
-# create argparser
-parser = argparse.ArgumentParser(description="Tutorial on creating a stage with terrain.")
+# add argparse arguments
+parser = argparse.ArgumentParser(description="Tutorial on spawning and interacting with an articulation.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
+
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-from omni.isaac.lab.sim import SimulationCfg, SimulationContext
-from omni.isaac.lab.terrains import TerrainGenerator, TerrainGeneratorCfg, SubTerrainBaseCfg
-import omni.usd
+import torch
 
-# Define a terrain generation function
-def perlin_noise_terrain(difficulty, cfg):
-    # Here we would define the actual terrain generation logic based on Perlin noise
-    # For demonstration purposes, we will just return mock data
-    size = cfg.size
-    mesh = None  # Replace with actual mesh generation logic
-    origin = (0, 0, 0)  # Replace with actual origin calculation logic
-    return mesh, origin
+import omni.isaac.core.utils.prims as prim_utils
+
+import omni.isaac.lab.sim as sim_utils
+from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
+
+from omni.isaac.lab.assets import Articulation
+from omni.isaac.lab.sim import SimulationContext
+
+from omni.isaac.lab.terrains import TerrainGenerator ,TerrainGeneratorCfg, SubTerrainBaseCfg, TerrainImporterCfg, TerrainImporter
+from omni.isaac.lab.terrains.height_field.hf_terrains import random_uniform_terrain, pyramid_sloped_terrain
+from omni.isaac.lab.terrains.height_field.hf_terrains_cfg import HfPyramidSlopedTerrainCfg, HfRandomUniformTerrainCfg
+
+##
+# Pre-defined configs
+##
+from asset.quadruped import HAMSTER_N_CFG
+
+
+def design_scene() -> tuple[dict, list[list[float]]]:
+    """Designs the scene."""
+    # Ground-plane
+    cfg = sim_utils.GroundPlaneCfg()
+    cfg.func("/World/defaultGroundPlane", cfg)
+    # Lights
+    cfg = sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
+    cfg.func("/World/Light", cfg)
+
+
+    hf_pyramid_sloped_terrain_cfg = HfPyramidSlopedTerrainCfg(
+        slope_range=(0.0, 1.0),
+        platform_width = 1.0,
+        inverted = False,
+        proportion = 1.0,
+        size = (10.0, 10.0),
+        border_width = 0.5,
+        horizontal_scale = 0.1,
+        vertical_scale = 0.005,
+        slope_threshold = 0.75,
+    )
+
+    hf_pyramid_sloped_terrain = pyramid_sloped_terrain(
+        difficulty = 0.3,
+        cfg = hf_pyramid_sloped_terrain_cfg
+    )
+
+    sub_terrain_1_cfg = SubTerrainBaseCfg(
+        function= hf_pyramid_sloped_terrain,
+        proportion=1.0,
+        size=(10.0, 10.0),
+    )
+
+    sub_terrain = {"sub_terrain_1": sub_terrain_1_cfg}
+
+    print("sub_terrain:", type(sub_terrain))
+
+    terrain_cfg = TerrainGeneratorCfg(
+        seed = 1,
+        curriculum = False,
+        size = (10.0, 10.0),
+        border_width = 0.5,
+        num_rows = 1,
+        num_cols = 1,
+        color_scheme = "height",
+        horizontal_scale = 0.1,
+        vertical_scale = 0.005,
+        slope_threshold = 0.75,
+        sub_terrains = sub_terrain,
+        difficulty_range = (0.0, 1.0),
+        #use_cache = True,
+        #cache_dir = "/home/jmin/isaac_ws/IsaacLab/docs/source/_static/terrain/height_field"
+    )
+    terrain_generator = TerrainGenerator(cfg=terrain_cfg, device="cuda:0")
+
+    terrain_import_cfg = TerrainImporterCfg(
+        prim_path="/World/Terrain",
+        terrain_type="generator",
+        terrain_generator=terrain_generator,
+    )
+
+    terrain_importer = TerrainImporter(cfg=terrain_import_cfg)
+
+
+    # Create separate groups called "Origin1", "Origin2", "Origin3"
+    # Each group will have a robot in it
+    origins = [[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]
+    # Origin 1
+    prim_utils.create_prim("/World/Origin1", "Xform", translation=origins[0])
+    # Origin 2
+    prim_utils.create_prim("/World/Origin2", "Xform", translation=origins[1])
+
+    # Articulation
+    hamster_n_cfg = HAMSTER_N_CFG.copy()
+    hamster_n_cfg.prim_path = "/World/Origin.*/Robot"
+    hamster_n = Articulation(cfg=hamster_n_cfg)
+
+    # return the scene information
+    scene_entities = {"hamster_n": hamster_n, "terrain": terrain_importer}
+    return scene_entities, origins
+
+
+def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articulation], origins: torch.Tensor):
+    """Runs the simulation loop."""
+    # Extract scene entities
+    # note: we only do this here for readability. In general, it is better to access the entities directly from
+    #   the dictionary. This dictionary is replaced by the InteractiveScene class in the next tutorial.
+    robot = entities["hamster_n"]
+    # Define simulation stepping
+    sim_dt = sim.get_physics_dt()
+    count = 0
+    # Simulation loop
+    while simulation_app.is_running():
+        # Apply random action
+        # -- generate random joint efforts
+        joint_pos, joint_vel = robot.data.default_joint_pos.clone(), robot.data.default_joint_vel.clone()
+
+        # -- apply action to the robot
+        test_pos = torch.tensor(robot.data.default_joint_pos, dtype=torch.float)
+        test_vel = torch.tensor([[0]*12], dtype=torch.float)
+        test_effort = torch.tensor([[0]*12], dtype=torch.float)
+
+        robot.set_joint_position_target(test_pos)
+        robot.set_joint_velocity_target(test_vel)
+        robot.set_joint_effort_target(test_effort)
+
+        print("joint_pos:", joint_pos)
+        print("joint_vel", joint_vel)
+
+        # -- write data to sim
+        robot.write_data_to_sim()
+        # Perform step
+        sim.step()
+        # Increment counter
+        count += 1
+        # Update buffers
+        robot.update(sim_dt)
+
 
 def main():
     """Main function."""
-
-    # Initialize the simulation context
-    sim_cfg = SimulationCfg(dt=0.01)
+    # Load kit helper
+    sim_cfg = sim_utils.SimulationCfg(device="cuda:0")
+    sim_cfg.dt = 0.005
     sim = SimulationContext(sim_cfg)
     # Set main camera
-    sim.set_camera_view([2.5, 2.5, 2.5], [0.0, 0.0, 0.0])
-
-    # Stage 설정
-    stage = omni.usd.get_context().get_stage()
-    omni.isaac.core.utils.prims.create_prim('/World', 'Xform')
-
-    # SubTerrainBaseCfg 설정
-    sub_terrain_cfg = SubTerrainBaseCfg(
-        function=perlin_noise_terrain,  # 함수 유형
-        proportion=1.0,  # 비율
-        size=(10, 10),  # 타일 수 (X, Y)
-        flat_patch_sampling=False  # 평탄한 패치 샘플링 사용 여부
-    )
-
-    # TerrainGeneratorCfg 설정
-    terrain_cfg = TerrainGeneratorCfg(
-        seed=42,  # 랜덤 시드 값
-        size=(10, 10),  # 타일 수 (X, Y)
-        num_rows=1,
-        num_cols=1,
-        border_width=0,
-        sub_terrains={"terrain_0": sub_terrain_cfg},  # SubTerrainBaseCfg 딕셔너리
-        horizontal_scale=1.0,  # 수평 스케일
-        vertical_scale=1.0,  # 수직 스케일
-        slope_threshold=1.0,  # 경사 임계값
-        use_cache=False  # 캐시 사용 여부
-    )
-
-    # TerrainGenerator 초기화 및 지형 생성
-    terrain_generator = TerrainGenerator(cfg=terrain_cfg)
-    terrain_generator.generate(stage, '/World/Terrain')
-
-    # 지형의 첫 타일의 위치 확인
-    first_tile_prim = stage.GetPrimAtPath('/World/Terrain/tile_0_0')
-    print(f"First tile prim path: {first_tile_prim.GetPath()}")
-
-    # 업데이트 및 뷰어 설정
-    omni.usd.get_context().save_as_stage("/path/to/your/saved_terrain.usd")  # 지형을 USD 파일로 저장
-    omni.kit.commands.execute('ChangeProperty', prop_path=Sdf.Path('/World/Terrain'), value=(0.0, 0.0, 0.0))  # 지형의 위치 설정
-
-    print("[INFO]: Terrain generation complete and saved to /path/to/your/saved_terrain.usd")
-
+    sim.set_camera_view([2.5, 0.0, 4.0], [0.0, 0.0, 2.0])
+    # Design scene
+    scene_entities, scene_origins = design_scene()
+    scene_origins = torch.tensor(scene_origins, device=sim.device)
     # Play the simulator
     sim.reset()
     # Now we are ready!
     print("[INFO]: Setup complete...")
-
-    # Simulate physics
-    while simulation_app.is_running():
-        # perform step
-        sim.step()
+    # Run the simulator
+    run_simulator(sim, scene_entities, scene_origins)
 
 
 if __name__ == "__main__":
