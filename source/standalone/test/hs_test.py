@@ -126,6 +126,19 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
         robot.update(sim_dt)
 
 
+        print("-------------------------------")
+        print(scene["camera"])
+        print("Received shape of rgb image: ", scene["camera"].data.output['rgb'].shape)
+        print("Received shape of rgb image: ", scene["camera"].data.output["distance_to_image_plane"].shape)
+        print("-------------------------------")
+        print(scene["height_scanner"])
+        print("Received max height value: ", torch.max(scene["height_scanner"].data.ray_hits_w[..., -1]).item())
+        print("-------------------------------")
+        print(scene["contact_forces"])
+        print("Received max contact force of: ", torch.max(scene["contact_forces"].data.net_forces_w).item())
+
+
+
 def main():
     """Main function."""
     # Load kit helper
