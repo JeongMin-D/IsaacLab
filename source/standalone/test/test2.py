@@ -28,6 +28,8 @@ from omni.isaac.lab.sim import SimulationContext
 from omni.isaac.lab.terrains import TerrainGenerator ,TerrainGeneratorCfg, SubTerrainBaseCfg, TerrainImporterCfg, TerrainImporter
 from omni.isaac.lab.terrains.height_field.hf_terrains import random_uniform_terrain, pyramid_sloped_terrain
 from omni.isaac.lab.terrains.height_field.hf_terrains_cfg import HfPyramidSlopedTerrainCfg, HfRandomUniformTerrainCfg
+from omni.isaac.lab.terrains.trimesh.mesh_terrains_cfg import MeshPyramidStairsTerrainCfg
+from omni.isaac.lab.terrains.trimesh.mesh_terrains import pyramid_stairs_terrain
 
 ##
 # Pre-defined configs
@@ -54,7 +56,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         border_width = 0.5,
         horizontal_scale = 0.1,
         vertical_scale = 0.005,
-        slope_threshold = 0.75,
+        #slope_threshold = 0.75,
     )
 
     hf_pyramid_sloped_terrain = pyramid_sloped_terrain(
@@ -62,13 +64,36 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         cfg = hf_pyramid_sloped_terrain_cfg
     )
 
+    tm_pyramid_stairs_terrain_cfg = MeshPyramidStairsTerrainCfg(
+        border_width = 0.5,
+        step_height_range = (0.1, 0.5),
+        step_width = 1.0,
+        platform_width = 1.0,
+        holes = False,
+        proportion = 1.0,
+        size = (10.0, 10.0),
+    )
+
+    tm_pyramid_stairs_terrain = pyramid_stairs_terrain(
+        difficulty = 0.3,
+        cfg = tm_pyramid_stairs_terrain_cfg
+    )
+
     sub_terrain_1_cfg = SubTerrainBaseCfg(
-        function= hf_pyramid_sloped_terrain,
+        function= [0 ,tm_pyramid_stairs_terrain],
         proportion=1.0,
         size=(10.0, 10.0),
     )
 
     sub_terrain = {"sub_terrain_1": sub_terrain_1_cfg}
+
+    # sub_terrain_1_cfg = SubTerrainBaseCfg(
+    #     function= hf_pyramid_sloped_terrain,
+    #     proportion=1.0,
+    #     size=(10.0, 10.0),
+    # )
+
+    # sub_terrain = {"sub_terrain_1": sub_terrain_1_cfg}
 
     print("sub_terrain:", type(sub_terrain))
 
