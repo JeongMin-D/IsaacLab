@@ -1,0 +1,15 @@
+function: omni.isaac.lab.terrains.trimesh.mesh_terrains:inverted_pyramid_stairs_terrain
+proportion: 0.3
+size:
+- 10.0
+- 10.0
+flat_patch_sampling: null
+border_width: 1.0
+step_height_range: !!python/tuple
+- 0.05
+- 0.23
+step_width: 0.3
+platform_width: 3.0
+holes: false
+difficulty: 0.7951488447902088
+seed: null
