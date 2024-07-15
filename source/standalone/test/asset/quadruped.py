@@ -65,7 +65,7 @@ HAMSTER_N_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 1.05),
+        pos=(0.0, 0.0, 0.42),
         joint_pos={
             "LF_HAA": -0.00,
             "RH_HAA": -0.00,

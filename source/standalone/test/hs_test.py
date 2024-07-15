@@ -24,14 +24,26 @@ from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
 
 from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.sim import SimulationContext
+from omni.isaac.lab.sensors.ray_caster import RayCasterCamera, RayCasterCameraCfg, patterns
+from omni.isaac.lab.sensors.ray_caster import RayCaster, RayCasterCfg, patterns
 
-from omni.isaac.lab.sensors import CameraCfg, ContactSensorCfg, RayCasterCfg, patterns
 
 ##
 # Pre-defined configs
 ##
 from asset.quadruped import HAMSTER_N_CFG
 
+def define_sensor() -> RayCaster:
+    ray_caster_cfg = RayCasterCfg(
+        prim_path="/World/Origin.*/Robot",
+        mesh_prim_paths=["/World/defaultGroundPlane"],
+        pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=(2.0, 2.0)),
+        attach_yaw_only=True,
+        debug_vis=not args_cli.headless,
+    )
+    ray_caster = RayCaster(cfg=ray_caster_cfg)
+
+    return ray_caster
 
 def design_scene() -> tuple[dict, list[list[float]]]:
     """Designs the scene."""
@@ -55,37 +67,10 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     hamster_n_cfg.prim_path = "/World/Origin.*/Robot"
     hamster_n = Articulation(cfg=hamster_n_cfg)
 
+    ray_caster = define_sensor()
+
     # return the scene information
-    scene_entities = {"hamster_n": hamster_n}
-
-
-    camera = CameraCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base/front_cam",
-        update_period=0.1,
-        height=480,
-        width=640,
-        data_types=['rgb', 'distance_to_image_plane'],
-        spawn=sim_utils.PinholeCameraCfg(
-            focal_length=24.0,
-            focus_distance=400.0,
-            horizontal_aperture=20.955,
-            clipping_range=(0.1, 1.0e5),
-        ),
-        offset=CameraCfg.OffsetCfg(
-            pos=(0.510, 0.0,0.015),
-            rot=(0.5, -0.5, 0.5, -0.5),
-            convention="ros"
-            ),
-    )
-
-    height_scanner = RayCasterCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/.*_FOOT",
-        update_period=0.0,
-        history_length=6,
-        debug_vis=True
-    )
-
-
+    scene_entities = {"hamster_n": hamster_n, "ray_caster": ray_caster}
     return scene_entities, origins
 
 
@@ -95,6 +80,7 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
     # note: we only do this here for readability. In general, it is better to access the entities directly from
     #   the dictionary. This dictionary is replaced by the InteractiveScene class in the next tutorial.
     robot = entities["hamster_n"]
+    ray_caster = entities["ray_caster"]
     # Define simulation stepping
     sim_dt = sim.get_physics_dt()
     count = 0
@@ -124,19 +110,7 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
         count += 1
         # Update buffers
         robot.update(sim_dt)
-
-
-        print("-------------------------------")
-        print(scene["camera"])
-        print("Received shape of rgb image: ", scene["camera"].data.output['rgb'].shape)
-        print("Received shape of rgb image: ", scene["camera"].data.output["distance_to_image_plane"].shape)
-        print("-------------------------------")
-        print(scene["height_scanner"])
-        print("Received max height value: ", torch.max(scene["height_scanner"].data.ray_hits_w[..., -1]).item())
-        print("-------------------------------")
-        print(scene["contact_forces"])
-        print("Received max contact force of: ", torch.max(scene["contact_forces"].data.net_forces_w).item())
-
+        ray_caster.update(dt=sim_dt, force_recompute=True)
 
 
 def main():
