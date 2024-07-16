@@ -195,6 +195,19 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
 
         #print("joint_pos:", joint_pos)
         #print("joint_vel", joint_vel)
+        
+        
+        # print information from the sensors
+        print("-------------------------------")
+        print(camera)
+        print("Received shape of rgb   image: ", camera.data.output["rgb"].shape)
+        print("Received shape of depth image: ", camera.data.output["distance_to_image_plane"].shape)
+        print("-------------------------------")
+        print(ray_caster)
+        print("Received max height value: ", torch.max(ray_caster.data.ray_hits_w[..., -1]).item())
+        print("-------------------------------")
+        print(contact_sensor)
+        print("Received max contact force of: ", torch.max(contact_sensor.data.net_forces_w).item())
 
         # -- write data to sim
         robot.write_data_to_sim()
