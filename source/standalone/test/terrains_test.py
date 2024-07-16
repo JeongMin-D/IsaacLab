@@ -28,8 +28,6 @@ from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.sim import SimulationContext
 
 import omni.isaac.lab.terrains as terrain_gen
-from omni.isaac.lab.terrains.height_field.hf_terrains_cfg import HfSteppingStonesTerrainCfg
-from omni.isaac.lab.terrains.mesh.mesh_terrains_cfg import MeshRandomGridTerrainCfg
 from omni.isaac.lab.terrains.terrain_generator_cfg import TerrainGeneratorCfg
 from omni.isaac.lab.terrains.terrain_generator import TerrainGenerator
 from omni.isaac.lab.terrains.terrain_importer import TerrainImporter
@@ -52,10 +50,10 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     test_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "output", "generator")
 
     test_terrain_cfg = TerrainGeneratorCfg(
-        size = [10.0, 10.0],
-        border_width = 10.0,
-        num_rows = 20,
-        num_cols = 20,
+        size = [5.0, 5.0],
+        border_width = 1.0,
+        num_rows = 3,
+        num_cols = 3,
         horizontal_scale = 0.1,
         vertical_scale = 0.005,
         slope_threshold = 0.75,
@@ -64,7 +62,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         cache_dir = test_dir,
         sub_terrains={
             "pyramid_stairs":terrain_gen.MeshPyramidStairsTerrainCfg(
-                proportion = 0.4,
+                proportion = 0.3,
                 step_height_range = (0.05, 0.23),
                 step_width = 0.3,
                 platform_width = 3.0,
@@ -88,44 +86,44 @@ def design_scene() -> tuple[dict, list[list[float]]]:
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
             ),
-            "pyramid_slope":terrain_gen.HfPyramidSlopeTerrainCfg(
+            "pyramid_slope":terrain_gen.HfPyramidSlopedTerrainCfg(
                 proportion = 0.3,
-                slope_range = (0.05, 0.23),
-                platform_width = 3.0,
+                slope_range = (0.05, 0.5),
+                platform_width = 0.3,
                 inverted = False,
-                border_width = 1.0,
+                border_width = 0.3,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
                 slope_threshold = 0.75,
             ),
             "pyramid_slope_inv":terrain_gen.HfPyramidSlopedTerrainCfg(
                 proportion = 0.3,
-                slope_range = (0.05, 0.23),
-                platform_width = 3.0,
+                slope_range = (0.05, 0.5),
+                platform_width = 0.3,
                 inverted = True,
-                border_width = 1.0,
+                border_width = 0.3,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
                 slope_threshold = 0.75,
             ),
             "hf_pyramid_stairs_slope":terrain_gen.HfPyramidStairsTerrainCfg(
                 proportion = 0.3,
-                step_height_range = (0.05, 0.23),
+                step_height_range = (0.05, 0.3),
                 step_width = 0.3,
-                platform_width = 3.0,
+                platform_width = 0.1,
                 inverted = False,
-                border_width = 1.0,
+                border_width = 0.3,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
                 slope_threshold = 0.75,
             ),
             "hf_pyramid_stairs_slope_inv":terrain_gen.HfInvertedPyramidStairsTerrainCfg(
                 proportion = 0.3,
-                step_height_range = (0.05, 0.23),
+                step_height_range = (0.05, 0.3),
                 step_width = 0.3,
-                platform_width = 3.0,
+                platform_width = 0.1,
                 inverted = True,
-                border_width = 1.0,
+                border_width = 0.3,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
                 slope_threshold = 0.75,
@@ -149,7 +147,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
                 amplitude_range = (0.1, 0.3),
                 num_waves = 1,
             ),
-            "stepping_stones":HfSteppingStonesTerrainCfg(
+            "stepping_stones":terrain_gen.HfSteppingStonesTerrainCfg(
                 proportion = 0.3,
                 border_width = 0.0,
                 horizontal_scale = 0.1,
@@ -161,12 +159,13 @@ def design_scene() -> tuple[dict, list[list[float]]]:
                 holes_depth = -10.0,
                 platform_width = 1.0,
             ),
-            "random_grid":MeshRandomGridTerrainCfg(
-                proportion = 0.3,
-                grid_width = 0.1,
-                grid_height_range = (0.1, 0.3),
-                platform_width = 1.0,
-                holes = False,
+            # border_width must be greater than 0(border_width = cfg.size[0] - min(num_boxes_x, num_boxes_y) * cfg.grid_width)
+            "random_grid":terrain_gen.MeshRandomGridTerrainCfg(
+                proportion = 1.0,
+                grid_width = 10.0,
+                grid_height_range = (0.1, 1.0),
+                platform_width = 0.3,
+                holes = True,
             ),
             "rails":terrain_gen.MeshRailsTerrainCfg(
                 proportion = 0.3,
@@ -178,7 +177,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
                 proportion = 0.3,
                 pit_depth_range = (0.1, 0.3),
                 platform_width = 1.0,
-                double_pitch = False,
+                double_pit = False,
             ),
             "box":terrain_gen.MeshBoxTerrainCfg(
                 proportion = 0.3,
