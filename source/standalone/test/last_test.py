@@ -94,10 +94,10 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     test_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "output", "generator")
 
     test_terrain_cfg = TerrainGeneratorCfg(
-        size = [10.0, 10.0],
-        border_width = 5.0,
-        num_rows = 20,
-        num_cols = 20,
+        size = [5.0, 5.0],
+        border_width = 0.0,
+        num_rows = 5,
+        num_cols = 5,
         horizontal_scale = 0.1,
         vertical_scale = 0.005,
         slope_threshold = 0.75,
