@@ -91,7 +91,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     cfg = sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     cfg.func("/World/Light", cfg)
 
-    test_dir = os.path.join("./", "ourput", "generator")
+    test_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "output", "generator")
 
     test_terrain_cfg = TerrainGeneratorCfg(
         size = [10.0, 10.0],
@@ -139,6 +139,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         prim_path = "/World/Terrain",
         max_init_terrain_level = None,
         terrain_type = "generator",
+        visual_material = None,
         terrain_generator = test_terrain_cfg.replace(curriculum=True, color_scheme="height"),
     )
 
