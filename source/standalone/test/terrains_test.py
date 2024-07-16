@@ -28,6 +28,8 @@ from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.sim import SimulationContext
 
 import omni.isaac.lab.terrains as terrain_gen
+from omni.isaac.lab.terrains.height_field.hf_terrains_cfg import HfSteppingStonesTerrainCfg
+from omni.isaac.lab.terrains.mesh.mesh_terrains_cfg import MeshRandomGridTerrainCfg
 from omni.isaac.lab.terrains.terrain_generator_cfg import TerrainGeneratorCfg
 from omni.isaac.lab.terrains.terrain_generator import TerrainGenerator
 from omni.isaac.lab.terrains.terrain_importer import TerrainImporter
@@ -85,6 +87,123 @@ def design_scene() -> tuple[dict, list[list[float]]]:
                 border_width = 1.0,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
+            ),
+            "pyramid_slope":terrain_gen.HfPyramidSlopeTerrainCfg(
+                proportion = 0.3,
+                slope_range = (0.05, 0.23),
+                platform_width = 3.0,
+                inverted = False,
+                border_width = 1.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = 0.75,
+            ),
+            "pyramid_slope_inv":terrain_gen.HfPyramidSlopedTerrainCfg(
+                proportion = 0.3,
+                slope_range = (0.05, 0.23),
+                platform_width = 3.0,
+                inverted = True,
+                border_width = 1.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = 0.75,
+            ),
+            "hf_pyramid_stairs_slope":terrain_gen.HfPyramidStairsTerrainCfg(
+                proportion = 0.3,
+                step_height_range = (0.05, 0.23),
+                step_width = 0.3,
+                platform_width = 3.0,
+                inverted = False,
+                border_width = 1.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = 0.75,
+            ),
+            "hf_pyramid_stairs_slope_inv":terrain_gen.HfInvertedPyramidStairsTerrainCfg(
+                proportion = 0.3,
+                step_height_range = (0.05, 0.23),
+                step_width = 0.3,
+                platform_width = 3.0,
+                inverted = True,
+                border_width = 1.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = 0.75,
+            ),
+            "discrete_obstacles":terrain_gen.HfDiscreteObstaclesTerrainCfg(
+                proportion = 0.3,
+                obstacle_height_mode = "choice",
+                border_width = 0.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = None,
+                obstacle_width_range = (0.1, 0.3),
+                obstacle_height_range = (0.1, 0.3),
+                num_obstacles = 5,
+            ),
+            "wave":terrain_gen.HfWaveTerrainCfg(
+                proportion = 0.3,
+                border_width = 0.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                amplitude_range = (0.1, 0.3),
+                num_waves = 1,
+            ),
+            "stepping_stones":HfSteppingStonesTerrainCfg(
+                proportion = 0.3,
+                border_width = 0.0,
+                horizontal_scale = 0.1,
+                vertical_scale = 0.005,
+                slope_threshold = None,
+                stone_height_max = 0.3,
+                stone_width_range = (0.1, 0.3),
+                stone_distance_range = (0.1, 0.3),
+                holes_depth = -10.0,
+                platform_width = 1.0,
+            ),
+            "random_grid":MeshRandomGridTerrainCfg(
+                proportion = 0.3,
+                grid_width = 0.1,
+                grid_height_range = (0.1, 0.3),
+                platform_width = 1.0,
+                holes = False,
+            ),
+            "rails":terrain_gen.MeshRailsTerrainCfg(
+                proportion = 0.3,
+                rail_thickness_range = (0.1, 0.3),
+                rail_height_range = (0.1, 0.3),
+                platform_width = 1.0,
+            ),
+            "pit":terrain_gen.MeshPitTerrainCfg(
+                proportion = 0.3,
+                pit_depth_range = (0.1, 0.3),
+                platform_width = 1.0,
+                double_pitch = False,
+            ),
+            "box":terrain_gen.MeshBoxTerrainCfg(
+                proportion = 0.3,
+                box_height_range = (0.1, 0.3),
+                platform_width = 1.0,
+                double_box = False,
+            ),
+            "gap":terrain_gen.MeshGapTerrainCfg(
+                proportion = 0.3,
+                gap_width_range = (0.1, 0.3),
+                platform_width = 1.0,
+            ),
+            "floating_ring":terrain_gen.MeshFloatingRingTerrainCfg(
+                proportion = 0.3,
+                ring_width_range = (0.1, 0.3),
+                ring_height_range = (0.1, 0.3),
+                ring_thickness = 0.1,
+                platform_width = 1.0,
+            ),
+            "star":terrain_gen.MeshStarTerrainCfg(
+                proportion = 0.3,
+                num_bars = 2,
+                bar_width_range = (0.1, 0.3),
+                bar_height_range = (0.1, 0.3),
+                platform_width = 1.0,
             ),
         }
     )
