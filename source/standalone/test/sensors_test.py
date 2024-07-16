@@ -127,30 +127,28 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         curriculum = False,
         cache_dir = test_dir,
         sub_terrains={
+            "box":terrain_gen.MeshBoxTerrainCfg(
+                proportion = 0.3,
+                box_height_range = (0.1, 0.1),
+                platform_width = 1.0,
+                double_box = True,
+            ),
             "pyramid_stairs":terrain_gen.MeshPyramidStairsTerrainCfg(
                 proportion = 0.4,
-                step_height_range = (0.05, 0.23),
-                step_width = 0.3,
-                platform_width = 3.0,
+                step_height_range = (0.05, 0.05),
+                step_width = 0.5,
+                platform_width = 1.0,
                 border_width = 1.0,
                 holes = False,
             ),
-            "pyramid_stairs_inv":terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+            "random_uniform":terrain_gen.HfWaveTerrainCfg(
                 proportion = 0.3,
-                step_height_range = (0.05, 0.23),
-                step_width = 0.3,
-                platform_width = 3.0,
-                border_width = 1.0,
-                holes = False,
-            ),
-            "random_uniform":terrain_gen.HfRandomUniformTerrainCfg(
-                proportion = 0.3,
-                noise_range = (0.1, 0.6),
-                noise_step = 0.05,
-                #size = (10.0, 10.0),
                 border_width = 1.0,
                 horizontal_scale = 0.1,
                 vertical_scale = 0.005,
+                slope_threshold = 0.75,
+                amplitude_range = (0.0, 0.1),
+                num_waves = 1,
             ),
         }
     )
