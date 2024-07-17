@@ -94,7 +94,7 @@ def define_sensor():
             clipping_range=(0.1, 1.0e5)
         ),
         offset=TiledCameraCfg.OffsetCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(1.0, 1.0, 0.0),
             rot=(0.5, -0.5, 0.5, -0.5),
             convention="ros"
         ),
@@ -118,8 +118,8 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     test_terrain_cfg = TerrainGeneratorCfg(
         size = [5.0, 5.0],
         border_width = 0.0,
-        num_rows = 5,
-        num_cols = 5,
+        num_rows = 1,
+        num_cols = 1,
         horizontal_scale = 0.1,
         vertical_scale = 0.005,
         slope_threshold = 0.75,
@@ -127,29 +127,39 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         curriculum = False,
         cache_dir = test_dir,
         sub_terrains={
-            "box":terrain_gen.MeshBoxTerrainCfg(
-                proportion = 0.3,
-                box_height_range = (0.1, 0.1),
-                platform_width = 1.0,
-                double_box = True,
-            ),
+            # "box":terrain_gen.MeshBoxTerrainCfg(
+            #     proportion = 0.3,
+            #     box_height_range = (0.5, 0.5),
+            #     platform_width = 1.0,
+            #     double_box = False,
+            # ),
             "pyramid_stairs":terrain_gen.MeshPyramidStairsTerrainCfg(
                 proportion = 0.4,
-                step_height_range = (0.05, 0.05),
-                step_width = 0.5,
+                step_height_range = (0.2, 0.2),
+                step_width = 0.3,
                 platform_width = 1.0,
-                border_width = 1.0,
-                holes = False,
+                border_width = 0.5,
+                holes = True,
             ),
-            "random_uniform":terrain_gen.HfWaveTerrainCfg(
-                proportion = 0.3,
-                border_width = 1.0,
-                horizontal_scale = 0.1,
-                vertical_scale = 0.005,
-                slope_threshold = 0.75,
-                amplitude_range = (0.0, 0.1),
-                num_waves = 1,
-            ),
+            # "pyramid_stairs":terrain_gen.HfPyramidStairsTerrainCfg(
+            #     proportion = 0.4,
+            #     step_height_range = (0.2, 0.2),
+            #     step_width = 0.3,
+            #     platform_width = 1.0,
+            #     border_width = 0.5,
+            #     horizontal_scale = 0.1,
+            #     vertical_scale = 0.005,
+            #     slope_threshold = 0.75,
+            # ),
+            # "random_uniform":terrain_gen.HfWaveTerrainCfg(
+            #     proportion = 0.3,
+            #     border_width = 0.1,
+            #     horizontal_scale = 0.1,
+            #     vertical_scale = 0.005,
+            #     slope_threshold = 0.75,
+            #     amplitude_range = (0.0, 1.0),
+            #     num_waves = 3,
+            # ),
         }
     )
 
@@ -167,7 +177,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
 
     # Create separate groups called "Origin1", "Origin2", "Origin3"
     # Each group will have a robot in it
-    origins = [[1.0, 5.0, 0.0], [-1.0, 5.0, 0.0]]
+    origins = [[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]
     # Origin 1
     prim_utils.create_prim("/World/Origin1", "Xform", translation=origins[0])
     # Origin 2
