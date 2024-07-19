@@ -47,7 +47,8 @@ def define_sensor():
         pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=(2.0, 2.0)),
         attach_yaw_only=True,
         offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        debug_vis=not args_cli.headless,
+        #debug_vis=not args_cli.headless,
+        debug_vis=False,
     )
     ray_caster = RayCaster(cfg=ray_caster_cfg)
 
@@ -80,8 +81,8 @@ def define_sensor():
     contact_sensor = ContactSensor(cfg=contact_sensor_cfg)
 
     tiled_camera_cfg = TiledCameraCfg(
-        prim_path="/World/Origin.*/Robot/base/depth_cam",
-        update_period=0.1,
+        prim_path="/World/Origin.*/Robot/base/front_camera_depth_optical_frame",
+        update_period=0.0,
         history_length=1.0,
         debug_vis=not args_cli.headless,
         data_types=["rgb", "depth"],
@@ -133,13 +134,21 @@ def design_scene() -> tuple[dict, list[list[float]]]:
             #     platform_width = 1.0,
             #     double_box = False,
             # ),
-            "pyramid_stairs":terrain_gen.MeshPyramidStairsTerrainCfg(
-                proportion = 0.4,
-                step_height_range = (0.2, 0.2),
+            # "pyramid_stairs":terrain_gen.MeshPyramidStairsTerrainCfg(
+            #     proportion = 0.4,
+            #     step_height_range = (0.2, 0.2),
+            #     step_width = 0.3,
+            #     platform_width = 1.0,
+            #     border_width = 0.5,
+            #     holes = True,
+            # ),
+            "pyramid_stairs_inv":terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+                proportion = 0.3,
+                step_height_range = (0.05, 0.23),
                 step_width = 0.3,
-                platform_width = 1.0,
-                border_width = 0.5,
-                holes = True,
+                platform_width = 3.0,
+                border_width = 1.0,
+                holes = False,
             ),
             # "pyramid_stairs":terrain_gen.HfPyramidStairsTerrainCfg(
             #     proportion = 0.4,
@@ -241,7 +250,7 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
         # print("Received max contact force of: ", torch.max(contact_sensor.data.net_forces_w).item())
         # print("-------------------------------")
         print(tiled_camera)
-        print("Received shape of rgb   image: ", tiled_camera.data.output["rgb"].shape)
+        #print("Received shape of rgb   image: ", tiled_camera.data.output["rgb"].shape)
         print("Received shape of depth image: ", tiled_camera.data.output["depth"].shape)
 
         # -- write data to sim
