@@ -214,8 +214,13 @@ def design_scene() -> tuple[dict, list[list[float]]]:
         max_init_terrain_level = None,
         terrain_type = "generator",
         visual_material = None,
-        #physics_material = "{prim_path}/physicsMaterial",
         terrain_generator = test_terrain_cfg.replace(curriculum=True, color_scheme="height"),
+        physics_material = sim_utils.RigidBodyMaterialCfg(
+            friction_combine_mode = "multiply",
+            restitution_combine_mode = "multiply",
+            static_friction = 1.0,
+            dynamic_friction = 1.0,
+        ),
     )
 
     # terrain_importer_cfg = terrain_gen.TerrainImporterCfg(
