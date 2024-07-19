@@ -237,7 +237,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
 
     # Create separate groups called "Origin1", "Origin2", "Origin3"
     # Each group will have a robot in it
-    origins = [[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]
+    origins = [[1.0, 0.0, 3.0], [-1.0, 0.0, 3.0]]
     # Origin 1
     prim_utils.create_prim("/World/Origin1", "Xform", translation=origins[0])
     # Origin 2
