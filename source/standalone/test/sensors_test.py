@@ -143,7 +143,7 @@ def design_scene() -> tuple[dict, list[list[float]]]:
             #     holes = True,
             # ),
             "pyramid_stairs_inv":terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
-                proportion = 0.3,
+                proportion = 1.0,
                 step_height_range = (0.05, 0.23),
                 step_width = 0.3,
                 platform_width = 3.0,
