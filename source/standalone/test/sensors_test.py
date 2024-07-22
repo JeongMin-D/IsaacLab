@@ -47,8 +47,8 @@ def define_sensor():
         pattern_cfg=patterns.GridPatternCfg(resolution=0.1, size=(2.0, 2.0)),
         attach_yaw_only=True,
         offset=RayCasterCfg.OffsetCfg(pos=(0.0, 0.0, 20.0)),
-        #debug_vis=not args_cli.headless,
-        debug_vis=False,
+        debug_vis=not args_cli.headless,
+        #debug_vis=False,
     )
     ray_caster = RayCaster(cfg=ray_caster_cfg)
 
