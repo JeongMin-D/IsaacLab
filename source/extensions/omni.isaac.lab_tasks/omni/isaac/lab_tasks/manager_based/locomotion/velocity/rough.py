@@ -21,7 +21,7 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
     sub_terrains={
         "pyramid_stairs": terrain_gen.MeshPyramidStairsTerrainCfg(
             proportion = 1.0,
-            step_height_range = (0.05, 0.23),
+            step_height_range = (0.23, 0.5),
             step_width = 0.5,
             platform_width = 3.0,
             border_width = 1.0,
@@ -29,15 +29,15 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
         ),
         "box":terrain_gen.MeshBoxTerrainCfg(
             proportion = 1.0,
-            box_height_range = (1.0, 1.0),
-            platform_width = 5.0,
+            box_height_range = (0.3, 0.3),
+            platform_width = 3.0,
             double_box = False,
         ),
         "hf_pyramid_stairs_slope":terrain_gen.HfPyramidStairsTerrainCfg(
             proportion = 1.0,
             step_height_range = (0.3, 0.3),
             step_width = 0.5,
-            platform_width = 0.1,
+            platform_width = 0.3,
             inverted = False,
             border_width = 0.0,
             horizontal_scale = 0.1,
@@ -50,7 +50,7 @@ ROUGH_TERRAINS_CFG = TerrainGeneratorCfg(
             horizontal_scale = 0.1,
             vertical_scale = 0.005,
             amplitude_range = (0.5, 0.5),
-            num_waves = 3,
+            num_waves = 1,
         ),
     },
 )
