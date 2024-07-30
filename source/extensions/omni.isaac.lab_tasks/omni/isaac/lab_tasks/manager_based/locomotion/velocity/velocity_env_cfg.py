@@ -28,7 +28,7 @@ import omni.isaac.lab_tasks.manager_based.locomotion.velocity.mdp as mdp
 ##
 # Pre-defined configs
 ##
-from omni.isaac.lab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
+from .rough import ROUGH_TERRAINS_CFG  # isort: skip
 
 
 ##
