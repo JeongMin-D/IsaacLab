@@ -134,6 +134,8 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
     while simulation_app.is_running():
         # reset
         if count % 200 == 0:
+            print("sim_time: ", sim_time)
+            print("sim_dt: ", sim_dt)
             # reset counters
             sim_time = 0.0
             count = 0
