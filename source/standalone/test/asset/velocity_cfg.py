@@ -93,15 +93,15 @@ class CommandsCfg:
 
     base_velocity = mdp.UniformVelocityCommandCfg(
         asset_name="robot",
-        resampling_time_range=(10.0, 10.0),
-        rel_standing_envs=0.02,
-        rel_heading_envs=1.0,
-        heading_command=True,
-        heading_control_stiffness=0.5,
-        debug_vis=True,
+        resampling_time_range=(10.0, 10.0), # 명령이 변하기 전의 시간
+        rel_standing_envs=0.02, # 로봇이 서있는 환경에 대한 확률 임계값
+        rel_heading_envs=1.0, # 방향 기반 각속도 명령을 따르는 환경에 대한 임계값
+        heading_command=True, # 헤딩 명령을 사용할지, 각속도 명령을 사용할지
+        heading_control_stiffness=0.5, # 방위 오차를 각속도 명령으로 변환하기 위한 축적 계수
+        debug_vis=True, # 디버그 정보 시각화
         ranges=mdp.UniformVelocityCommandCfg.Ranges(
             lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
-        ),
+        ), # 속도 명령에 대한 분포 범위
     )
 
 
@@ -109,7 +109,7 @@ class CommandsCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True)
+    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True) # 조인트 위치 동작 항목 구성
 
 
 @configclass

@@ -49,6 +49,16 @@ ANYDRIVE_3_LSTM_ACTUATOR_CFG = ActuatorNetLSTMCfg(
 """Configuration for ANYdrive 3.0 (used on ANYmal-C) with LSTM actuator model."""
 
 
+HAMSTER_N_ACTUATOR_CFG = IdealPDActuatorCfg(
+    joint_names_expr=[".*HAA", ".*HFE", ".*KFE"],
+    effort_limit=50.0,
+    velocity_limit=21.0,
+    stiffness=20.0,
+    damping=5.0,
+    friction=0.0,
+)
+
+
 ##
 # Configuration - Articulation.
 ##
@@ -127,7 +137,7 @@ ANYMAL_B_CFG = ArticulationCfg(
 
 HAMSTER_N_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"/home/jmin/isaac_ws/isaaclab_test/hamster_n.usd",
+        usd_path=f"/home/jmin/isaac_ws/isaaclab_test/usd/hamster_n.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -143,7 +153,7 @@ HAMSTER_N_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 1.05),
+        pos=(0.0, 0.0, 0.42),
         joint_pos={
             "LF_HAA": -0.00,
             "RH_HAA": -0.00,
@@ -161,17 +171,7 @@ HAMSTER_N_CFG = ArticulationCfg(
         joint_vel={".*": 0.4},
     ),
     soft_joint_pos_limit_factor=0.40,
-    actuators={
-        "base_legs": IdealPDActuatorCfg(
-            joint_names_expr=[".*HAA", ".*HFE", ".*KFE"],
-            effort_limit=50.0,
-            #saturation_effort=330.0,
-            velocity_limit=21.0,
-            stiffness=20.0,
-            damping=5.0,
-            friction=0.0,
-        ),
-    },
+    actuators={"base_legs": HAMSTER_N_ACTUATOR_CFG},
 )
 """Configuration of Unitree A1 using DC motor."""
 
