@@ -62,6 +62,7 @@ torch.backends.cudnn.benchmark = False
 
 
 def main():
+    print("gym_registry: ", gym.envs.registry.keys())
     """Train with RSL-RL agent."""
     # parse configuration
     env_cfg: ManagerBasedRLEnvCfg = parse_env_cfg(
